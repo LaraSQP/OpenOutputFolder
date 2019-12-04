@@ -105,7 +105,7 @@ namespace OpenOutputFolder
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
 
-			var dlg		= new SelectTool( Dte );
+			var dlg		= new SelectTool( Dte, Package );
 			var hwnd	= new IntPtr( Dte.MainWindow.HWnd );
 			var window	= ( System.Windows.Window )HwndSource.FromHwnd( hwnd ).RootVisual;
 

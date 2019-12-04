@@ -25,6 +25,6 @@
 				<BindingGroup ValidatesOnNotifyDataError="False"/>
 			</ListBox.ItemBindingGroup>
 		</ListBox>
-		<CheckBox x:Name="chActiveDocument" Content="Active Document" HorizontalAlignment="Left" Margin="348,10,-258,0" VerticalAlignment="Top" MinHeight="24" MinWidth="111" VerticalContentAlignment="Center" RenderTransformOrigin="2.568,-0.986"/>
+		<CheckBox x:Name="chSelectedItem" Content="Selected Item" HorizontalAlignment="Left" Margin="348,10,-258,0" VerticalAlignment="Top" MinHeight="24" MinWidth="111" VerticalContentAlignment="Center" RenderTransformOrigin="2.568,-0.986"/>
 	</Grid>
 </Window>

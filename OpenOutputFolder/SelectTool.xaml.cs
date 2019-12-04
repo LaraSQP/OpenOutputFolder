@@ -6,6 +6,9 @@ using System.Windows;
 using System.Windows.Input;
 using EnvDTE80;
 using LaraSPQ.Tools;
+using Microsoft.VisualStudio.Settings;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Settings;
 using Ookii.Dialogs.Wpf;
 
 namespace OpenOutputFolder
@@ -15,7 +18,30 @@ namespace OpenOutputFolder
 	/// </summary>
 	public partial class SelectTool : System.Windows.Window
 	{
+		// Settings' constants
+		private const string	SS_Collection	= "OpenOutputFolder";
+		private const string	SS_WindowTop	= "WindowTop";
+		private const string	SS_WindowLeft	= "WindowLeft";
+		private const string	SS_WindowHeight = "WindowHeight";
+		private const string	SS_WindowWidth	= "WindowWidth";
+		private const string	SS_WindowState	= "WindowState";
+		private const string	SS_LeftPanelTC	= "LeftPanelTC";
+		private const string	SS_RightPanelTC = "RightPanelTC";
+		private const string	SS_SelectedItem = "SelectedItem";
+		private const string	SS_TCPath		= "Total Commander";
+		private const string	SS_ConEmuPath	= "ConEmu";
+
+		// Properties
 		private DTE2 Dte
+		{
+			get; set;
+		}
+
+		private AsyncPackage Package
+		{
+			get; set;
+		}
+		private WritableSettingsStore WritableSettingsStore
 		{
 			get; set;
 		}
@@ -26,11 +52,12 @@ namespace OpenOutputFolder
 		/// <summary>
 		/// Constructor
 		/// </summary>
-		public SelectTool( DTE2 dte )
+		public SelectTool( DTE2 dte, AsyncPackage package )
 		{
 			InitializeComponent();
 
-			Dte = dte;
+			Dte		= dte;
+			Package = package;
 		}
 
 
@@ -53,30 +80,57 @@ namespace OpenOutputFolder
 			WindowExtensions.HideMinimizeAndMaximizeButtons( this, hideMaximize: false );
 
 			// Restore window size and position, if any
-			if( Properties.Settings.Default.WindowHeight != -1 )
+			try
 			{
-				WindowStartupLocation	= WindowStartupLocation.Manual;
-				SizeToContent			= SizeToContent.Manual;
-				Top						= Properties.Settings.Default.WindowTop;
-				Left					= Properties.Settings.Default.WindowLeft;
-				Width					= Properties.Settings.Default.WindowHeight;
-				Height					= Properties.Settings.Default.WindowWidth;
-				WindowState				= Properties.Settings.Default.WindowState;
-			}
+				var settingsManager = new ShellSettingsManager( this.Package );
 
-			// Restore other settings
-			rbLeftPanelTC.IsChecked		= Properties.Settings.Default.LeftPanelTC;
-			rbRightPanelTC.IsChecked	= Properties.Settings.Default.RightPanelTC;
-			chActiveDocument.IsChecked	= Properties.Settings.Default.ActiveDocument;
+				WritableSettingsStore = settingsManager.GetWritableSettingsStore( SettingsScope.UserSettings );
+
+				if( WritableSettingsStore.CollectionExists( SS_Collection ) == true )
+				{
+					// These two are required from now on
+					WindowStartupLocation	= WindowStartupLocation.Manual;
+					SizeToContent			= SizeToContent.Manual;
+
+					// Window size and position
+					Top			= WritableSettingsStore.GetInt32( SS_Collection, SS_WindowTop );
+					Left		= WritableSettingsStore.GetInt32( SS_Collection, SS_WindowLeft );
+					Height		= WritableSettingsStore.GetInt32( SS_Collection, SS_WindowHeight );
+					Width		= WritableSettingsStore.GetInt32( SS_Collection, SS_WindowWidth );
+					WindowState = (WindowState)WritableSettingsStore.GetInt32( SS_Collection, SS_WindowState );
+
+					// Other settings
+					rbLeftPanelTC.IsChecked		= WritableSettingsStore.GetBoolean( SS_Collection, SS_LeftPanelTC );
+					rbRightPanelTC.IsChecked	= WritableSettingsStore.GetBoolean( SS_Collection, SS_RightPanelTC );
+					chSelectedItem.IsChecked	= WritableSettingsStore.GetBoolean( SS_Collection, SS_SelectedItem );
+				}
+				else
+				{
+					// Create collection now to be able to check for other settings the 1st time around
+					WritableSettingsStore.CreateCollection( SS_Collection );
+
+					// Must have a default
+					rbLeftPanelTC.IsChecked = ( WritableSettingsStore.PropertyExists( SS_Collection, SS_LeftPanelTC ) == true )?
+											  WritableSettingsStore.GetBoolean( SS_Collection, SS_LeftPanelTC ) : true;
+					rbRightPanelTC.IsChecked = ( WritableSettingsStore.PropertyExists( SS_Collection, SS_RightPanelTC ) == true )?
+											   WritableSettingsStore.GetBoolean( SS_Collection, SS_RightPanelTC ) : false;
+				}
+			}
+			catch( Exception )
+			{
+				// Ignore quietly
+			}
 
 			// Load configurations and active path
 #pragma warning disable VSTHRD010
-			if ( Paths.ListSolutionConfigurations( Dte, lbConfigurations, ref _activePath ) == false )
+
+			if( Paths.ListSolutionConfigurations( Dte, lbConfigurations, ref _activePath ) == false )
 			{
 				// Something went wrong so abort
 				// Error reporting, if any, is to be done in the calling method above
 				Close();
 			}
+
 #pragma warning restore VSTHRD010
 		}
 
@@ -88,15 +142,30 @@ namespace OpenOutputFolder
 		/// </summary>
 		private void OnClosing( object sender, CancelEventArgs e )
 		{
-			Properties.Settings.Default.WindowTop		= Top;
-			Properties.Settings.Default.WindowLeft		= Left;
-			Properties.Settings.Default.WindowHeight	= Width;
-			Properties.Settings.Default.WindowWidth		= Height;
-			Properties.Settings.Default.WindowState		= WindowState;
+			try
+			{
+				// This check should be unnecessary unless there was an Exception in OnLoad
+				if( WritableSettingsStore.CollectionExists( SS_Collection ) == false )
+				{
+					WritableSettingsStore.CreateCollection( SS_Collection );
+				}
 
-			Properties.Settings.Default.LeftPanelTC		= rbLeftPanelTC.IsChecked ?? false;
-			Properties.Settings.Default.RightPanelTC	= rbRightPanelTC.IsChecked ?? false;
-			Properties.Settings.Default.ActiveDocument	= chActiveDocument.IsChecked ?? false;
+				// Window size and position
+				WritableSettingsStore.SetInt32( SS_Collection, SS_WindowTop, (int)Top );
+				WritableSettingsStore.SetInt32( SS_Collection, SS_WindowLeft, ( int )Left );
+				WritableSettingsStore.SetInt32( SS_Collection, SS_WindowWidth, (int)Width );
+				WritableSettingsStore.SetInt32( SS_Collection, SS_WindowHeight, (int)Height );
+				WritableSettingsStore.SetInt32( SS_Collection, SS_WindowState, (int)WindowState );
+
+				// Other settings
+				WritableSettingsStore.SetBoolean( SS_Collection, SS_LeftPanelTC, rbLeftPanelTC.IsChecked ?? false );
+				WritableSettingsStore.SetBoolean( SS_Collection, SS_RightPanelTC, rbRightPanelTC.IsChecked ?? false );
+				WritableSettingsStore.SetBoolean( SS_Collection, SS_SelectedItem, chSelectedItem.IsChecked ?? false );
+			}
+			catch( Exception )
+			{
+				// Ignore quietly
+			}
 		}
 
 
@@ -121,28 +190,9 @@ namespace OpenOutputFolder
 
 		private void btTotalCommander_Click( object sender, RoutedEventArgs e )
 		{
-			var toolPath = GetExePath( "Total Commander", Properties.Settings.Default.TCPath );
+			var arguments = "/O /T /{0}=".FormatWith( ( rbLeftPanelTC.IsChecked == true )? 'L' : 'R' );
 
-			if( toolPath.IsNullOrWhitespace() == true
-				|| File.Exists( toolPath ) == false )
-			{
-				Box.Error( "The path to Total Commander is invalid." );
-			}
-			else
-			{
-				// Update settings if needed
-				if( Properties.Settings.Default.TCPath != toolPath )
-				{
-					Properties.Settings.Default.TCPath = toolPath;
-				}
-
-				// Make arguments
-				var filePath	= GetFilePath();
-				var arguments	= "/O /T /{0}={1}".FormatWith( ( rbLeftPanelTC.IsChecked == true )? 'L' : 'R', filePath );
-
-				// Fire up tool
-				FireToolAndQuit( toolPath, arguments );
-			}
+			FireTool( SS_TCPath, arguments );
 		}
 
 
@@ -150,27 +200,65 @@ namespace OpenOutputFolder
 
 		private void btConEmu_Click( object sender, RoutedEventArgs e )
 		{
-			var toolPath = GetExePath( "Total Commander", Properties.Settings.Default.ConEmuPath );
+			var arguments = "-Reuse /Dir ";
+
+			FireTool( SS_ConEmuPath, arguments );
+		}
+
+
+
+
+		/// <summary>
+		/// Fires up TC/ConEmu by means of a setting indicating which tool to use and appropriate arguments for each
+		/// </summary>
+		private void FireTool( string setting, string arguments )
+		{
+			( bool cancelled, string toolPath ) = GetExePath( setting );
+
+			if( cancelled == true )
+			{
+				// Quit quietly
+				return;
+			}
 
 			if( toolPath.IsNullOrWhitespace() == true
 				|| File.Exists( toolPath ) == false )
 			{
-				Box.Error( "The path to Total Commander is invalid." );
+				Box.Error( "The path to {0} is invalid.".FormatWith( setting ) );
 			}
 			else
 			{
 				// Update settings if needed
-				if( Properties.Settings.Default.ConEmuPath != toolPath )
+				if( WritableSettingsStore.PropertyExists( SS_Collection, setting ) == false
+					|| WritableSettingsStore.GetString( SS_Collection, setting ) != toolPath )
 				{
-					Properties.Settings.Default.ConEmuPath = toolPath;
+					WritableSettingsStore.SetString( SS_Collection, setting, toolPath );
 				}
 
 				// Make arguments
-				var filePath	= GetFilePath();
-				var arguments	= "-Reuse /Dir \"{0}\"".FormatWith( filePath );
+				try
+				{
+					var filePath	= GetFilePath();
+					var process		= System.Diagnostics.Process.Start( new ProcessStartInfo
+					{
+						FileName = toolPath,
+						Arguments = "{0}\"{1}\"".FormatWith( arguments, filePath ),
+					} );
 
-				// Fire up tool
-				FireToolAndQuit( toolPath, arguments );
+					System.Threading.Thread.Sleep( 250 );
+
+					if( process != null
+						&& process.HasExited == false )
+					{
+						WindowExtensions.SetForegroundWindow( process.MainWindowHandle );
+					}
+				}
+				catch( Exception ex )
+				{
+					Box.Error( "Unable to fire {0}, exception:".FormatWith( setting ), ex.Message );
+				}
+
+				Close();
 			}
 		}
 
@@ -186,18 +274,20 @@ namespace OpenOutputFolder
 			var filePath = null as string;
 
 			if( lbConfigurations.SelectedItem != null
-				&& chActiveDocument.IsChecked != true )
+				&& chSelectedItem.IsChecked != true )
 			{
 				filePath = lbConfigurations.SelectedItem.ToString();
 			}
 			else
 			{
-				if( Directory.Exists(_activePath)==true)
+				if( Directory.Exists( _activePath ) == true )
 				{
 					filePath = _activePath;
 				}
 				else
-				filePath = Path.GetDirectoryName( _activePath );
+				{
+					filePath = Path.GetDirectoryName( _activePath );
+				}
 			}
 
 			return filePath;
@@ -206,37 +296,16 @@ namespace OpenOutputFolder
 
 
 
-		private void FireToolAndQuit( string toolPath, string arguments )
+		/// <summary>
+		/// Gets path to TC/ConEmu from settings or prompts the user if that fails
+		/// </summary>
+		private ( bool, string )GetExePath( string setting )
 		{
-			try
-			{
-				var process = System.Diagnostics.Process.Start( new ProcessStartInfo
-				{
-					FileName = toolPath,
-					Arguments = arguments,
-				} );
-
-				System.Threading.Thread.Sleep( 250 );
-
-				if( process != null
-					&& process.HasExited == false )
-				{
-					WindowExtensions.SetForegroundWindow( process.MainWindowHandle );
-				}
-			}
-			catch( Exception ex )
-			{
-				Box.Error( "Unable to fire TC/ConEmu, exception:", ex.Message );
-			}
-
-			Close();
-		}
+			var cancelled	= false;
+			var path		= ( WritableSettingsStore.PropertyExists( SS_Collection, setting ) == true )?
+							  WritableSettingsStore.GetString( SS_Collection, setting ) : null as string;
 
 
-
-
-		private string GetExePath( string tool, string path )
-		{
 			if( path.IsNullOrWhitespace() == true
 				|| File.Exists( path ) == false )
 			{
@@ -250,21 +319,26 @@ namespace OpenOutputFolder
 						InitialDirectory	= ( path.IsNullOrWhitespace() == true )? "" : System.IO.Path.GetDirectoryName( path ),
 						Multiselect			= false,
 						RestoreDirectory	= true,
-						Title				= "Enter path to " + tool,
+						Title				= "Enter path to " + setting,
 					};
 
 					if( (bool)dlg.ShowDialog( this ) == true )
 					{
 						path = dlg.FileName;
 					}
+					else
+					{
+						cancelled = true;
+					}
 				}
 				catch( PathTooLongException ex )
 				{
 					Box.Error( "Path too long, exception:", ex.Message );
+					cancelled = true;
 				}
 			}
 
-			return path;
+			return ( cancelled, path );
 		}
 	}
 }
