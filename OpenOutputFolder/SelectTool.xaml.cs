@@ -6,7 +6,6 @@ using System.Windows;
 using System.Windows.Input;
 using EnvDTE80;
 using LaraSPQ.Tools;
-using Microsoft.VisualStudio.Shell;
 using Ookii.Dialogs.Wpf;
 
 namespace OpenOutputFolder
@@ -184,7 +183,7 @@ namespace OpenOutputFolder
 		/// <exception cref="PathTooLongException">Ignore.</exception>
 		private string GetFilePath()
 		{
-			string filePath;
+			var filePath = null as string;
 
 			if( lbConfigurations.SelectedItem != null
 				&& chActiveDocument.IsChecked != true )
@@ -193,6 +192,11 @@ namespace OpenOutputFolder
 			}
 			else
 			{
+				if( Directory.Exists(_activePath)==true)
+				{
+					filePath = _activePath;
+				}
+				else
 				filePath = Path.GetDirectoryName( _activePath );
 			}
 

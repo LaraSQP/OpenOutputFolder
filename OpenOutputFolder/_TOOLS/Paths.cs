@@ -82,11 +82,25 @@ namespace LaraSPQ.Tools
 					// It is a solution or a solution folder (including its contents and projects)
 					activePath = dte.Solution.FullName;
 
-					if( item.Project != null )
+					if(item.ProjectItem != null
+						&& item.ProjectItem.ContainingProject.Kind == "{66A26720-8FB5-11D2-AA7E-00C04F688DDE}" )
 					{
-						activeProject = item.Project;
+						// It is a solution folder item
+						activePath = Path.Combine( Path.GetDirectoryName( activePath ), item.ProjectItem.ContainingProject.Name );
 					}
-					else if( dte.Solution.Projects.Count > 0 )
+					else if( item.Project != null )
+					{
+						if( item.Project.ConfigurationManager != null )
+						{
+							activeProject = item.Project;
+						}
+						else
+						{
+							activePath = Path.Combine( Path.GetDirectoryName( activePath ), item.Project.Name );
+						}
+					}
+					else
+					if( dte.Solution.Projects.Count > 0 )
 					{
 						if( dte.Solution.Projects.Count > 0 )
 						{
