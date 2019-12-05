@@ -214,14 +214,16 @@ namespace LaraSPQ.Tools
 				{
 					ls.Add( property.Name + ":=" + property.Value.ToString() );
 				}
-				catch( Exception ex )
+				catch( Exception )
 				{
-					var x = ex.Message;
+
+					// Ignore quietly
 				}
 			}
 
 			return ls;
 		}
+#pragma warning disable VSTHRD010
 
 
 

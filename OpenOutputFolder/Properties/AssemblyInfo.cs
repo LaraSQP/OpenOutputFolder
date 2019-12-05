@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("OpenOutputFolder")]
-[assembly: AssemblyCopyright("Copyright (c) 2019 LaraSQP")]
+[assembly: AssemblyCopyright("Copyright by LaraSQP")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

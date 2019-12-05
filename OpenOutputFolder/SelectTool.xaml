@@ -7,7 +7,7 @@
 	mc:Ignorable="d"
 	Loaded="OnLoad"
 	Closing="OnClosing"
-	Title="Open output folder in ConEmu or TotalCommander" SizeToContent="WidthAndHeight" MinHeight="300" MinWidth="500" ResizeMode="CanResizeWithGrip" ShowInTaskbar="False" WindowStartupLocation="CenterScreen">
+	Title="Open output folder in ConEmu or Total Commander" SizeToContent="WidthAndHeight" MinHeight="300" MinWidth="500" ResizeMode="CanResizeWithGrip" ShowInTaskbar="False" WindowStartupLocation="CenterScreen">
 	<Grid Margin="0">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto"/>
@@ -25,6 +25,6 @@
 				<BindingGroup ValidatesOnNotifyDataError="False"/>
 			</ListBox.ItemBindingGroup>
 		</ListBox>
-		<CheckBox x:Name="chSelectedItem" Content="Selected Item" HorizontalAlignment="Left" Margin="348,10,-258,0" VerticalAlignment="Top" MinHeight="24" MinWidth="111" VerticalContentAlignment="Center" RenderTransformOrigin="2.568,-0.986"/>
+		<CheckBox x:Name="chSelectedItem" Content="Selected item" HorizontalAlignment="Left" Margin="348,10,-258,0" VerticalAlignment="Top" MinHeight="24" MinWidth="111" VerticalContentAlignment="Center" RenderTransformOrigin="2.568,-0.986"/>
 	</Grid>
 </Window>
