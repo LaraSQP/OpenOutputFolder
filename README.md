@@ -13,7 +13,7 @@ Optionally, the extension can also open the folder of the selected item in the `
 
 Install from the `Open VSIX gallery` via the `Extensions -> Manage Extensions` menu (you might need to add the feed, see [this](http://vsixgallery.com/guide/feed/)) or [download the latest CI build]() as a `VSIX` package and install it manually.
 
-- **Note that** the `releases` tab here in `github` will either be empty or have out-of-date releases.
+- **Note that** the `releases` tab at `github` will either be empty or have out-of-date releases.
 
 ## Getting Started
 
