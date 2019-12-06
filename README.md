@@ -1,6 +1,7 @@
 # OpenOutputFolder
 
-[![Build status](https://ci.appveyor.com/api/projects/status/s5lpx2ignav8idxo?svg=true)](https://ci.appveyor.com/project/LaraSQP/openoutputfolder)
+[![Build status](https://ci.appveyor.com/api/projects/status/k4tuto4slae2kj0e?svg=true
+)](https://ci.appveyor.com/project/LaraSQP/openoutputfolder)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](license.txt)
 
 This extension makes it possible to open the output folders of a solution in `ConEmu` and `Total Commander`.

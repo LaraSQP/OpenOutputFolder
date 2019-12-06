@@ -82,7 +82,7 @@ namespace OpenOutputFolder
 			// Restore window size and position, if any
 			try
 			{
-				var settingsManager = new ShellSettingsManager( this.Package );
+				var settingsManager = new ShellSettingsManager( Package );
 
 				WritableSettingsStore = settingsManager.GetWritableSettingsStore( SettingsScope.UserSettings );
 
