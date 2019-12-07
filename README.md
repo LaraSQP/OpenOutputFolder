@@ -1,4 +1,4 @@
-# OpenOutputFolder
+# Open Output Folder in ConEmu and Total Commander
 
 [![Build status](https://ci.appveyor.com/api/projects/status/k4tuto4slae2kj0e?svg=true
 )](https://ci.appveyor.com/project/LaraSQP/openoutputfolder)
