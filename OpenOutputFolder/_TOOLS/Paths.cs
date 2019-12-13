@@ -82,7 +82,7 @@ namespace LaraSPQ.Tools
 					// It is a solution or a solution folder (including its contents and projects)
 					activePath = dte.Solution.FullName;
 
-					if(item.ProjectItem != null
+					if( item.ProjectItem != null
 						&& item.ProjectItem.ContainingProject.Kind == "{66A26720-8FB5-11D2-AA7E-00C04F688DDE}" )
 					{
 						// It is a solution folder item
@@ -216,15 +216,17 @@ namespace LaraSPQ.Tools
 				}
 				catch( Exception )
 				{
-
 					// Ignore quietly
 				}
 			}
 
 			return ls;
 		}
-#pragma warning disable VSTHRD010
 
+
+
+
+#pragma warning disable VSTHRD010
 
 
 
@@ -243,12 +245,16 @@ namespace LaraSPQ.Tools
 
 			var ls = new List<Project>();
 
-			ls.AddRange( sln.Projects.Cast<Project>() );
+			// Projects without a configuration manager (e.g. unloaded projects, solutions folders)
+			// do not have the property "OutputPath" needed by OOF
+			ls.AddRange( sln.Projects.Cast<Project>().Where( x => ( x.ConfigurationManager != null ) ) );
 
 			for( int i = 0; i < ls.Count; i++ )
 			{
-				// OfType will ignore null's (i.e., unloaded project)
-				ls.AddRange( ls[ i ].ProjectItems.Cast<ProjectItem>().Select( x => x.SubProject ).OfType<Project>() );
+				// Again, skip (sub)projects without a configuration manager
+				ls.AddRange( ls[ i ].ProjectItems.Cast<ProjectItem>()
+							 .Select( x => x.SubProject ).OfType<Project>()
+							 .Where( x => ( x.ConfigurationManager != null ) ) );
 			}
 
 			return ls;
