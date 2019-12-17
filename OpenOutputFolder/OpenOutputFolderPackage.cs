@@ -50,11 +50,11 @@ namespace OpenOutputFolder
 			// Do any initialization that requires the UI thread after switching to the UI thread.
 			await this.JoinableTaskFactory.SwitchToMainThreadAsync( cancellationToken );
 
-			var _dte = await GetServiceAsync( typeof( DTE ) ) as DTE2;
+			var dte = await GetServiceAsync( typeof( DTE ) ) as DTE2;
 
-			Assumes.Present( _dte );
+			Assumes.Present( dte );
 
-			await Oof.InitializeAsync( this, _dte );
+			await Oof.InitializeAsync( this, dte );
 		}
 	}
 }

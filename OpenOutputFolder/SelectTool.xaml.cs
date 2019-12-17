@@ -100,9 +100,17 @@ namespace OpenOutputFolder
 					WindowState = (WindowState)WritableSettingsStore.GetInt32( SS_Collection, SS_WindowState );
 
 					// Other settings
+					chSelectedItem.IsChecked = WritableSettingsStore.GetBoolean( SS_Collection, SS_SelectedItem );
+
 					rbLeftPanelTC.IsChecked		= WritableSettingsStore.GetBoolean( SS_Collection, SS_LeftPanelTC );
 					rbRightPanelTC.IsChecked	= WritableSettingsStore.GetBoolean( SS_Collection, SS_RightPanelTC );
-					chSelectedItem.IsChecked	= WritableSettingsStore.GetBoolean( SS_Collection, SS_SelectedItem );
+
+					if( rbLeftPanelTC.IsChecked == rbRightPanelTC.IsChecked )
+					{
+						// Impossible case that should not be possible but has somehow happened, so here is the fix
+						rbLeftPanelTC.IsChecked		= true;
+						rbRightPanelTC.IsChecked	= false;
+					}
 				}
 				else
 				{
@@ -110,10 +118,7 @@ namespace OpenOutputFolder
 					WritableSettingsStore.CreateCollection( SS_Collection );
 
 					// Must have a default
-					rbLeftPanelTC.IsChecked = ( WritableSettingsStore.PropertyExists( SS_Collection, SS_LeftPanelTC ) == true )?
-											  WritableSettingsStore.GetBoolean( SS_Collection, SS_LeftPanelTC ) : true;
-					rbRightPanelTC.IsChecked = ( WritableSettingsStore.PropertyExists( SS_Collection, SS_RightPanelTC ) == true )?
-											   WritableSettingsStore.GetBoolean( SS_Collection, SS_RightPanelTC ) : false;
+					rbLeftPanelTC.IsChecked = true;
 				}
 			}
 			catch( Exception )

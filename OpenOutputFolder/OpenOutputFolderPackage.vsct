@@ -37,7 +37,6 @@
 
     <GuidSymbol name="guidImages" value="{73690c5b-51bb-4681-a199-29c2907c0e5c}" >
       <IDSymbol name="bmpPic1" value="1" />
-
     </GuidSymbol>
   </Symbols>
 </CommandTable>

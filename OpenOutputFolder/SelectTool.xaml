@@ -72,11 +72,7 @@
 				 VerticalContentAlignment="Stretch"
 				 Grid.Row="1"
 				 TabIndex="2"
-				 HorizontalContentAlignment="Stretch">
-			<ListBox.ItemBindingGroup>
-				<BindingGroup ValidatesOnNotifyDataError="False" />
-			</ListBox.ItemBindingGroup>
-		</ListBox>
+				 HorizontalContentAlignment="Stretch" />
 		<CheckBox x:Name="chSelectedItem"
 				  Content="Selected item"
 				  HorizontalAlignment="Left"
