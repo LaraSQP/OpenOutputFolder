@@ -30,7 +30,7 @@ Install from the `Open VSIX gallery` via the `Extensions -> Manage Extensions` m
 
 - On running **OpenOutputFolder**, it will find the `selected item` in the `Solution Explorer` window, proceed to list all projects and their configurations in its solution, and highlight the one that corresponds to the `selected item` in the `configurations listbox`, as shown below.
 
-![off window](https://user-images.githubusercontent.com/12540983/70190950-ac087980-173a-11ea-84a5-7c376c746da8.jpg)
+![off window](https://user-images.githubusercontent.com/12540983/71337662-ede54c80-258f-11ea-8df1-4487421e0468.jpg)
 
 
 - The default button is `TC`, which will take the selected folder from the `configurations listbox` and open it in a new tab in the `right panel` (per the appropriate checkbox) of `Total Commander` and bring it to the foreground. Thus, in general, pressing 'Enter' upon invoking **OpenOutputFolder** is sufficient.
@@ -40,6 +40,8 @@ Install from the `Open VSIX gallery` via the `Extensions -> Manage Extensions` m
 - In both cases, running instances of `ConEmu/Total Commander` will be used, if available.
 
 - If the checkbox `Active item` is checked, `ConEmu/Total Commander` will open the folder containing the selected item in the `Solution Explorer` window instead of the selection in the `configurations listbox`. Note that `Active item` will "stick" and, if checked, will pop up checked next time **OpenOutputFolder** in run.
+
+- Double-clicking on a configuration opens it in `Total Commander` without further ado, ignoring the state of the `Active Item` checkbox.
 
 - If by any chance there are no items selected in the `Solution Explorer` window, **OpenOutputFolder** will try to use the currently active document in the IDE. Failing that, **OpenOutputFolder** will give up quietly and not even open.
 

@@ -73,8 +73,8 @@
 				 Grid.Row="1"
 				 TabIndex="2"
 				 HorizontalContentAlignment="Stretch" />
-		<CheckBox x:Name="chSelectedItem"
-				  Content="Selected item"
+		<CheckBox x:Name="chActiveItem"
+				  Content="Active item"
 				  HorizontalAlignment="Left"
 				  Margin="348,10,-258,0"
 				  VerticalAlignment="Top"

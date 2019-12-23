@@ -167,6 +167,8 @@ namespace LaraSPQ.Tools
 				var item		= lbConfigurations.Items.Cast<string>().First( x => x == fullPath );
 
 				lbConfigurations.SelectedItem = item;
+
+				lbConfigurations.ScrollIntoView( item );
 			}
 		}
 

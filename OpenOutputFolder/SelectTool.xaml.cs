@@ -2,7 +2,9 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using EnvDTE80;
 using LaraSPQ.Tools;
@@ -27,7 +29,7 @@ namespace OpenOutputFolder
 		private const string	SS_WindowState	= "WindowState";
 		private const string	SS_LeftPanelTC	= "LeftPanelTC";
 		private const string	SS_RightPanelTC = "RightPanelTC";
-		private const string	SS_SelectedItem = "SelectedItem";
+		private const string	SS_ActiveItem	= "ActiveItem";
 		private const string	SS_TCPath		= "Total Commander";
 		private const string	SS_ConEmuPath	= "ConEmu";
 
@@ -100,7 +102,7 @@ namespace OpenOutputFolder
 					WindowState = (WindowState)WritableSettingsStore.GetInt32( SS_Collection, SS_WindowState );
 
 					// Other settings
-					chSelectedItem.IsChecked = WritableSettingsStore.GetBoolean( SS_Collection, SS_SelectedItem );
+					chActiveItem.IsChecked = WritableSettingsStore.GetBoolean( SS_Collection, SS_ActiveItem );
 
 					rbLeftPanelTC.IsChecked		= WritableSettingsStore.GetBoolean( SS_Collection, SS_LeftPanelTC );
 					rbRightPanelTC.IsChecked	= WritableSettingsStore.GetBoolean( SS_Collection, SS_RightPanelTC );
@@ -137,6 +139,9 @@ namespace OpenOutputFolder
 			}
 
 #pragma warning restore VSTHRD010
+
+			// Double-click on an item brings up TotalCommander without further ado
+			lbConfigurations.MouseDoubleClick += LbConfigurations_MouseDoubleClick;
 		}
 
 
@@ -165,11 +170,12 @@ namespace OpenOutputFolder
 				// Other settings
 				WritableSettingsStore.SetBoolean( SS_Collection, SS_LeftPanelTC, rbLeftPanelTC.IsChecked ?? false );
 				WritableSettingsStore.SetBoolean( SS_Collection, SS_RightPanelTC, rbRightPanelTC.IsChecked ?? false );
-				WritableSettingsStore.SetBoolean( SS_Collection, SS_SelectedItem, chSelectedItem.IsChecked ?? false );
+				WritableSettingsStore.SetBoolean( SS_Collection, SS_ActiveItem, chActiveItem.IsChecked ?? false );
 			}
-			catch( Exception )
+			catch( ArgumentException ex )
 			{
-				// Ignore quietly
+				Box.Error( "Error saving settings.",
+						   "Exception:", ex.Message );
 			}
 		}
 
@@ -188,6 +194,18 @@ namespace OpenOutputFolder
 				// Quit quietly
 				Close();
 			}
+		}
+
+
+
+
+		private void LbConfigurations_MouseDoubleClick( object sender, MouseButtonEventArgs e )
+		{
+			// Double-clicking on a configuration opens it in Total Commander without further ado,
+			// ignoring the state of the Active Item checkbox
+			var arguments = "/O /T /{0}=".FormatWith( ( rbLeftPanelTC.IsChecked == true )? 'L' : 'R' );
+
+			FireTool( SS_TCPath, arguments, ignoreActiveItem: true );
 		}
 
 
@@ -216,7 +234,9 @@ namespace OpenOutputFolder
 		/// <summary>
 		/// Fires up TC/ConEmu by means of a setting indicating which tool to use and appropriate arguments for each
 		/// </summary>
-		private void FireTool( string setting, string arguments )
+		private void FireTool( string setting,
+							   string arguments,
+							   bool ignoreActiveItem = false )
 		{
 			( bool cancelled, string toolPath ) = GetExePath( setting );
 
@@ -243,14 +263,14 @@ namespace OpenOutputFolder
 				// Make arguments
 				try
 				{
-					var filePath	= GetFilePath();
-					var process		= System.Diagnostics.Process.Start( new ProcessStartInfo
+					var filePath	= GetFilePath( ignoreActiveItem );
+					var process		= Process.Start( new ProcessStartInfo
 					{
 						FileName = toolPath,
 						Arguments = "{0}\"{1}\"".FormatWith( arguments, filePath ),
 					} );
 
-					System.Threading.Thread.Sleep( 250 );
+					Thread.Sleep( 250 );
 
 					if( process != null
 						&& process.HasExited == false )
@@ -273,13 +293,14 @@ namespace OpenOutputFolder
 		/// <summary>
 		/// Gets path from configurations' listbox or, if nothing selected, the active's file path
 		/// </summary>
-		/// <exception cref="PathTooLongException">Ignore.</exception>
-		private string GetFilePath()
+		/// <exception cref="PathTooLongException"></exception>
+		private string GetFilePath( bool ignoreActiveItem = false )
 		{
 			var filePath = null as string;
 
 			if( lbConfigurations.SelectedItem != null
-				&& chSelectedItem.IsChecked != true )
+				&& ( ignoreActiveItem == true
+					 || chActiveItem.IsChecked != true ) )
 			{
 				filePath = lbConfigurations.SelectedItem.ToString();
 			}
