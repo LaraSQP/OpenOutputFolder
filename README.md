@@ -17,20 +17,20 @@ Install from the `Open VSIX gallery` via the `Extensions -> Manage Extensions` m
 
 ## Getting Started
 
-- Once installed, the `Extensions` menu will show the entry ![oof](https://user-images.githubusercontent.com/12540983/85630345-6b5c5780-b6ae-11ea-818d-891ca6254f03.png) `Open output folder`, as shown below:
+- Once installed, the `Extensions` menu will show the entry ![off](https://user-images.githubusercontent.com/12540983/85833202-4f4ed800-b7cc-11ea-9d5d-5bece4a79ef4.png) `Open output folder`, as shown below:
 
-![menu](https://user-images.githubusercontent.com/12540983/85630412-8333db80-b6ae-11ea-8a61-ae831cbffed5.png)
+![menu](https://user-images.githubusercontent.com/12540983/85833199-4eb64180-b7cc-11ea-8a38-3b595ca7501f.png)
 
 - A quick way to get to **OpenOutputFolder** is to add the extension to the toolbar, as shown in the image below (bottom right below) or to manually assign a shortcut to it via `Options -> Keyboard -> Openoutputfolder`.
 
-![toolbar](https://user-images.githubusercontent.com/12540983/85631101-deb29900-b6af-11ea-9b4a-25cf666f90f3.png)
+![toolbar](https://user-images.githubusercontent.com/12540983/85833205-4fe76e80-b7cc-11ea-97ef-bcecdd02fc69.png)
 
 
 - **Note that** the first time `ConEmu` or `Total Commander` are invoked, the user will be prompted for the location of the corresponding executable. Were this location to change, the user will be prompted again. Otherwise, **OpenOutputFolder** remembers these locations once first set.
 
 - On running **OpenOutputFolder**, it will find the `selected item` in the `Solution Explorer` window, proceed to list all projects and their configurations in its solution, and highlight the one that corresponds to the `selected item` in the `configurations listbox`, as shown below.
 
-![pop](https://user-images.githubusercontent.com/12540983/85630429-921a8e00-b6ae-11ea-9663-0a4e4172b927.png)
+![pop](https://user-images.githubusercontent.com/12540983/85833417-a6ed4380-b7cc-11ea-9c25-dbee27abf1e7.png)
 
 
 - The default button is `TC`, which will take the selected folder from the `configurations listbox` and open it in a new tab in the `right panel` (per the appropriate checkbox) of `Total Commander` and bring it to the foreground. Thus, in general, pressing 'Enter' upon invoking **OpenOutputFolder** is sufficient.
